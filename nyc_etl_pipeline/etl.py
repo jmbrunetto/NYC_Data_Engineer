@@ -20,21 +20,22 @@ class ETLProcess:
         input_file_path = self.config.destination_folder
         if os.path.exists(input_file_path):
             for file in os.listdir(input_file_path):
-                logger.info(f"Starting {file} ingestion")
-                try:
-                    df = pd.read_csv(f"{input_file_path}\{file}",
-                                     dtype=yellow_dataset.mapper,
-                                     parse_dates=yellow_dataset.parse_dates)
-                    valid_df = self.validate(df, file)
-                    # Selecting only the columns needed
-                    valid_df = valid_df[["month_id", "PULocationID", "DOLocationID", "passenger_count"]]
+                if file[0:1] != '.':
+                    logger.info(f"Starting {file} ingestion")
+                    try:
+                        df = pd.read_csv(f"{input_file_path}\{file}",
+                                         dtype=yellow_dataset.mapper,
+                                         parse_dates=yellow_dataset.parse_dates)
+                        valid_df = self.validate(df, file)
+                        # Selecting only the columns needed
+                        valid_df = valid_df[["month_id", "PULocationID", "DOLocationID", "passenger_count"]]
 
-                    self.send_to_destinations(valid_df, self.config.destinations)
+                        self.send_to_destinations(valid_df, self.config.destinations)
 
-                    shutil.move(f"{input_file_path}\{file}", f"{self.config.process_folder}\{file}")
-                except Exception as e:
-                    logger.error(f"it was not possible to load {file} due to {e}")
-                    shutil.move(f"{input_file_path}\{file}", f"{self.config.error_folder}\{file}")
+                        shutil.move(f"{input_file_path}\{file}", f"{self.config.process_folder}\{file}")
+                    except Exception as e:
+                        logger.error(f"it was not possible to load {file} due to {e}")
+                        shutil.move(f"{input_file_path}\{file}", f"{self.config.error_folder}\{file}")
 
     def validate(self, df, filename):
         return_df = df.dropna(subset=['PULocationID', 'DOLocationID', "tpep_pickup_datetime"])
