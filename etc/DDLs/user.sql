@@ -1,0 +1,1 @@
+CREATE USER IF NOT EXISTS 'crosslend_user'@'localhost' IDENTIFIED BY 'crosslend_pass';
