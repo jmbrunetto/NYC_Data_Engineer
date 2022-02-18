@@ -1,0 +1,17 @@
+certifi==2021.10.8
+charset-normalizer==2.0.12
+greenlet==1.1.2
+idna==3.3
+numpy==1.22.2
+pandas==1.4.1
+pandas-schema==0.3.5
+pyhocon==0.3.59
+PyMySQL==1.0.2
+pyparsing==2.4.7
+python-dateutil==2.8.2
+pytz==2021.3
+requests==2.27.1
+six==1.16.0
+SQLAlchemy==1.4.31
+urllib3==1.26.8
+wget==3.2
