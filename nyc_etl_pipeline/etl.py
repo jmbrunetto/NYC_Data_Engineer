@@ -14,7 +14,6 @@ class ETLProcess:
     def __init__(self):
         self.config = ConfigHelper("nyc_etl_pipeline").config
         self.db_conn = DbConn()
-        self.process()
 
     def process(self):
         input_file_path = self.config.destination_folder
@@ -23,7 +22,8 @@ class ETLProcess:
                 if file[0:1] != '.':
                     logger.info(f"Starting {file} ingestion")
                     try:
-                        df = pd.read_csv(f"{input_file_path}\{file}",
+                        work_file = os.path.join(input_file_path, file)
+                        df = pd.read_csv(work_file,
                                          dtype=yellow_dataset.mapper,
                                          parse_dates=yellow_dataset.parse_dates)
                         valid_df = self.validate(df, file)
@@ -32,10 +32,10 @@ class ETLProcess:
 
                         self.send_to_destinations(valid_df, self.config.destinations)
 
-                        shutil.move(f"{input_file_path}\{file}", f"{self.config.process_folder}\{file}")
+                        shutil.move(work_file, f"{self.config.process_folder}\\{file}")
                     except Exception as e:
                         logger.error(f"it was not possible to load {file} due to {e}")
-                        shutil.move(f"{input_file_path}\{file}", f"{self.config.error_folder}\{file}")
+                        shutil.move(work_file, f"{self.config.error_folder}\\{file}")
 
     def validate(self, df, filename):
         return_df = df.dropna(subset=['PULocationID', 'DOLocationID', "tpep_pickup_datetime"])
@@ -46,7 +46,7 @@ class ETLProcess:
     def create_ranking_qtd_passenger_or_trips(self, df, method):
         # Creating the Aggregation to use Rank
         # With method = sum we are agg the qty of user who travel
-        # With method = coutn we are agg the qty of trips
+        # With method = count we are agg the qty of trips
         work_df = df.groupby(["pick_up", "drop_off", "month_id"]). \
             agg({"passenger_count": method}). \
             reset_index()
@@ -57,7 +57,6 @@ class ETLProcess:
         work_df.drop(work_df[work_df['rank_id'] > self.config.rank_limit].index, inplace=True)
         work_df.drop(columns=["passenger_count"], inplace=True)
         return work_df
-
 
 
     def send_to_destinations(self, df, destinations):

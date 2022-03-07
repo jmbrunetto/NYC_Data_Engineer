@@ -34,6 +34,7 @@ class DbConn:
                 self.remove_duplicate_ranks(engine,table_name)
         except Exception as e:
             logger.error(f"Failed to connect to db with error: {e}")
+            raise e
         finally:
             self.close_conn(engine)
 
@@ -42,6 +43,7 @@ class DbConn:
                         FROM     {table} AS p1 
                         CROSS JOIN ( SELECT	 pick_up, drop_off , rank_id, max(month_id) month_id 
                                      FROM 	 {table}
+                                     WHERE   month_id = {table}
                                      GROUP   BY 1, 2, 3
                                      HAVING  COUNT(1) > 1
                                    ) AS p2

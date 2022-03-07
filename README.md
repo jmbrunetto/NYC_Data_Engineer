@@ -23,7 +23,7 @@ pip install -r requirements.txt
 ``` 
 
 - Update the `instance.conf` file with yours credentials
-  - `destination_folder` = The folder where the dataset file will be donwloaded and readed. 
+  - `destination_folder` = The folder where the dataset file will be downloaded and readed. 
   - `process_folder` = Folder where the processed files will be stored
   - `error_folder` = Destination in case of any error on processing
   - `hostname` = Database hostname
