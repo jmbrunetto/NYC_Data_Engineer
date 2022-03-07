@@ -39,11 +39,12 @@ class DbConn:
             self.close_conn(engine)
 
     def remove_duplicate_ranks(self, engine, table):
+        #Need to add the month filter on line 47 to avoid compare with older data
         sql_query = f"""DELETE   p1
                         FROM     {table} AS p1 
                         CROSS JOIN ( SELECT	 pick_up, drop_off , rank_id, max(month_id) month_id 
                                      FROM 	 {table}
-                                     WHERE   month_id = {table}
+                                     WHERE   month_id = {table} 
                                      GROUP   BY 1, 2, 3
                                      HAVING  COUNT(1) > 1
                                    ) AS p2
